@@ -23,6 +23,7 @@ class OpenGraphParser {
       var document = parser.parse(utf8.decode(response.bodyBytes));
       var openGraphMetaTags = _getOpenGraphData(document);
 
+      if(openGraphMetaTags.isNotEmpty)
       openGraphMetaTags.forEach((element) {
         var ogTagTitle = element.attributes['property'].split("og:")[1];
         var ogTagValue = element.attributes['content'];
@@ -35,6 +36,14 @@ class OpenGraphParser {
           data[ogTagTitle] = ogTagValue;
         }
       });
+      else {
+        data['title'] = document.head.parent.querySelector("title").nodes[0].text;
+        var images = document.querySelectorAll("img");
+        if(images.isNotEmpty){
+          var image =images.first;
+          data["image"]= image.attributes["src"];
+        }
+      }
     }
 
     return data;

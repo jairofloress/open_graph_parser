@@ -40,13 +40,49 @@ class OpenGraphParser {
         data['title'] = document.head.parent.querySelector("title").nodes[0].text;
         var images = document.querySelectorAll("img");
         if(images.isNotEmpty){
-          var image =images.first;
-          data["image"]= image.attributes["src"];
+          for (var image in images) {
+            var image_path = image.attributes["src"];
+            if (isValidUrl(image_path)){
+              data["image"]= image.attributes["src"];
+               break;
+            }else{
+              if(isValidWebPath(image_path)){
+                data["image"]= response.request.url.origin + image_path;
+                break;
+              }
+            }
+          }
         }
       }
     }
 
     return data;
+  }
+
+  static bool isValidWebPath(link) {
+    String regexSource =
+        "^\/([^?\/]+)";
+    final regex = RegExp(regexSource);
+    final matches = regex.allMatches(link);
+    for (Match match in matches) {
+      if (match.start == 0 && match.end == link.length) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static bool isValidUrl(link) {
+    String regexSource =
+        "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+    final regex = RegExp(regexSource);
+    final matches = regex.allMatches(link);
+    for (Match match in matches) {
+      if (match.start == 0 && match.end == link.length) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static String _scrapeAlternateToEmptyValue(

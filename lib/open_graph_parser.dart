@@ -11,7 +11,7 @@ class OpenGraphParser {
   /// @returns A map containing the OG-data.
   static Future<Map<String, dynamic>> getOpenGraphData(String url) async {
     var response = await http.get(url);
-    
+
     return getOpenGraphDataFromResponse(response);
   }
 
@@ -44,7 +44,7 @@ class OpenGraphParser {
             var image_path = image.attributes["src"];
             if (isValidUrl(image_path)){
               data["image"]= image.attributes["src"];
-               break;
+              break;
             }else{
               if(isValidWebPath(image_path)){
                 data["image"]= response.request.url.origin + image_path;
@@ -52,6 +52,7 @@ class OpenGraphParser {
               }
             }
           }
+          return data;
         }
       }
     }
@@ -60,14 +61,9 @@ class OpenGraphParser {
   }
 
   static bool isValidWebPath(link) {
-    String regexSource =
-        "^\/([^?\/]+)";
-    final regex = RegExp(regexSource);
-    final matches = regex.allMatches(link);
-    for (Match match in matches) {
-      if (match.start == 0 && match.end == link.length) {
+    final regex = RegExp(r"^\/([^?\/]+)");
+      if (regex.hasMatch(link)) {
         return true;
-      }
     }
     return false;
   }
